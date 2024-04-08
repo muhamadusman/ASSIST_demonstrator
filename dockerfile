@@ -13,17 +13,17 @@ RUN pip install numpy nibabel scipy
 WORKDIR /usr/src/app
 
 # Copy the scripts and orchestration script into the container
-COPY convert.py getnifty.py process_volumes.sh ./
+COPY convert.py getnifty.py Process_nifty.sh ./
 
 # Make the orchestration script executable
-RUN chmod +x process_volumes.sh
+RUN chmod +x Process_nifty.sh
 
 # Define environment variables if needed
 # ENV ...
 
 # The command to run the orchestration script
-CMD ["./process_volumes.sh"]
+CMD ["./Process_nifty.sh"]
 
-COPY process_volumes.sh .
+COPY Process_nifty.sh .
 RUN chmod +x process_volumes.sh
-CMD ["./process_volumes.sh"]
+CMD ["./Process_nifty.sh"]
