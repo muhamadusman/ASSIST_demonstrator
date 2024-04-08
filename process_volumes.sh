@@ -19,6 +19,6 @@ python convert.py "$DICOM_DIR" "$NIFTI_TEMP_DIR"
 
 echo "Processing NIfTI volumes..."
 # Process the NIfTI volumes to generate the final volume
-python getnifty.py --source_dir "$NIFTI_TEMP_DIR" --temp_dir "$PROCESSING_TEMP_DIR" --resampled_dir "$RESAMPLED_DIR" --final_dir "$FINAL_DIR"
+python Process_nifty.py --source_dir "$NIFTI_TEMP_DIR" --temp_dir "$PROCESSING_TEMP_DIR" --resampled_dir "$RESAMPLED_DIR" --final_dir "$FINAL_DIR"
 
 echo "Processing complete. Final volume is in $FINAL_DIR."
