@@ -1,29 +1,35 @@
-# Use an official Python runtime as a parent image
-FROM python:3.8-slim
+FROM python:3.8
 
-# Install any necessary dependencies
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     dcm2niix \
-    && rm -rf /var/lib/apt/lists/*
+    libc6 \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    dcmtk \
+ && rm -rf /var/lib/apt/lists/*
 
-# Install Python dependencies required by the scripts
-RUN pip install numpy nibabel scipy
 
-# Set the working directory in the container
-WORKDIR /usr/src/app
+# Install Python dependencies
+RUN pip install --no-cache-dir \
+    numpy \
+    nibabel \
+    monai \
+    scipy \
+    pydicom \
+    SimpleITK \
+    matplotlib \
+    pydicom \
+    rt_utils \
+    scikit-image 
 
-# Copy the scripts and orchestration script into the container
-COPY convert.py getnifty.py Process_nifty.sh ./
+# Copy the scripts and any other necessary files into the image
+COPY . /app
+WORKDIR /app
 
-# Make the orchestration script executable
-RUN chmod +x Process_nifty.sh
+# Make sure the main script is executable
+RUN chmod +x process_pipeline.py
 
-# Define environment variables if needed
-# ENV ...
+# Set the ENTRYPOINT to run your master script
+ENTRYPOINT ["python", "process_pipeline.py"]
 
-# The command to run the orchestration script
-CMD ["./Process_nifty.sh"]
-
-COPY Process_nifty.sh .
-RUN chmod +x process_volumes.sh
-CMD ["./Process_nifty.sh"]
