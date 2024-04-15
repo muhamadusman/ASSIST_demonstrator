@@ -1,11 +1,12 @@
 import os
 import shutil
-import numpy as np
 import nibabel as nib
 import scipy.ndimage
 import glob
 import sys
 import argparse
+import numpy as np
+from scipy.ndimage import zoom
 
 def padAroundImageCenter(imageArray, paddedSize):
     origShape = imageArray.shape
@@ -26,7 +27,6 @@ def flip_volume_if_needed(nifti_file, data):
 
 
 def resample_and_reshape_volume(nifti_file, new_shape, new_spacing, output_folder):
-    # specific_file_to_flip = "dicom_Ax_T2_GD_a_20000101000101_6.nii"  # Ensure name matches exactly
     
     img = nib.load(nifti_file)
     data = img.get_fdata()
@@ -35,9 +35,6 @@ def resample_and_reshape_volume(nifti_file, new_shape, new_spacing, output_folde
     # Debugging print statement
     print(f"Processing file: {os.path.basename(nifti_file)}")
 
-    # if os.path.basename(nifti_file) == specific_file_to_flip:
-    #     print(f"Flipping {specific_file_to_flip} vertically before resampling.")
-    #     data = np.flip(data, axis=0)  # Flipping operation
     specific_text = "Ax_T2_GD"
     filename = os.path.basename(nifti_file)
     
@@ -77,32 +74,7 @@ def process_volumes_in_folder(input_folder, output_folder, new_shape, new_spacin
     for nifti_file in nifti_files:
         resample_and_reshape_volume(nifti_file, new_shape, new_spacing, output_folder)
 
-# def process_volumes_in_folder(input_folder, output_folder, new_shape, new_spacing):
-#     nifti_files = [f for f in glob.glob(os.path.join(input_folder, '*.nii'))]
-#     if not nifti_files:
-#         print(f"No NIfTI files found in {input_folder}. Exiting.")
-#         sys.exit(1)
 
-#     # Substrings to match in the filenames
-#     substrings = ["Sag_3D_T1_GD", "Sag_3D_T2_flair", "Sag_3D_T1"]
-
-#     for nifti_file in nifti_files:
-#         # Check if the file name contains any of the specified substrings
-#         if any(substring in os.path.basename(nifti_file) for substring in substrings):
-#             # Reorient the volume to standard anatomical orientation before resampling and reshaping
-#             reoriented_nii = reorient_to_standard(nifti_file)
-
-#             # Proceed with resampling and reshaping
-#             resample_and_reshape_volume(reoriented_nii, new_shape, new_spacing, output_folder)
-
-
-
-
-import os
-import glob
-import nibabel as nib
-import numpy as np
-from scipy.ndimage import zoom
 
 def resample_volume(nifti_file, output_folder, target_shape):
     img = nib.load(nifti_file)
@@ -180,21 +152,23 @@ if __name__ == "__main__":
     resampled_dir = args.resampled_dir
     final_dir = args.final_dir
 
-    text_fragments = ["dicom_Sag_3D_T1_GD", "dicom_Sag_3D_T2_flair", "dicom_Sag_3D_T1", "dicom_Ax_T2_GD"]
+    text_fragments = ["Sag_3D_T1_GD", "Sag_3D_T2_flair", "Sag_3D_T1", "Ax_T2_GD"]
     new_shape = (256, 256, 140)
     new_spacing = (1.0, 1.0, 2.0)
 
-    # os.makedirs(temp_dir, exist_ok=True)
-    # os.makedirs(resampled_dir, exist_ok=True)
-    # os.makedirs(final_dir, exist_ok=True)
-
-
     # Step 1: Copy relevant .nii files to temp directory
     for filename in os.listdir(source_dir):
-        if any(text in filename for text in text_fragments) and filename.endswith('.nii'):
-            shutil.copy2(os.path.join(source_dir, filename), os.path.join(temp_dir, filename))
+        if filename.endswith('.nii') and any(text in filename for text in text_fragments):
+            try:
+                source_file_path = os.path.join(source_dir, filename)
+                dest_file_path = os.path.join(temp_dir, filename)
+                shutil.copy2(source_file_path, dest_file_path)
+                print(f"Copied: {filename}")
+            except Exception as e:
+                print(f"Failed to copy {filename}: {e}")
         else:
             print(f"Skipping file not matching criteria: {filename}")
+
 
 
     target_shape = (512, 512, 392)  # The desired new shape
