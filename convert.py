@@ -23,4 +23,5 @@ if __name__ == "__main__":
     dicom_folder = sys.argv[1]
     output_folder = sys.argv[2]
     
+    
     convert_dicom_to_nifti(dicom_folder, output_folder)
