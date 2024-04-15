@@ -8,7 +8,7 @@ from monai.networks.nets import SegResNet
 from monai.inferers import sliding_window_inference
 import collections
 import argparse
-
+import glob
 
 def get_transform():
     return Compose([
@@ -86,10 +86,21 @@ def predict_and_process_volume(input_volume_path, model, device, transform, orig
 
     upsample_and_reorient_volume(tmp_output_path, original_shape, original_spacing, reference_volume_path, output_folder)
     os.remove(tmp_output_path)
-    
-    print ("******")
+  
 
+def find_nii_volume_with_name(directory, pattern):
+    # Construct the search pattern
+    search_pattern = os.path.join(directory, f"*{pattern}*.nii")
 
+    # Use glob to find files matching the pattern
+    matching_files = glob.glob(search_pattern)
+
+    # Check if we found any matching files
+    if matching_files:
+        # For simplicity, return the first matching file's full path
+        return matching_files[0]
+    else:
+        return None
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run inference on a NIfTI volume.")
@@ -98,14 +109,18 @@ if __name__ == "__main__":
     
     args = parser.parse_args()
     
-    base_path = "/app/" 
+    base_path = "/appdata/" 
     ref_nifty_path = "/tmp/nifti/"
     input_volume_path = args.input_volume_path
     output_folder = args.output_folder
     
+    print ("Input Volume  : ", input_volume_path)
+    print (" Output volume Path : ", output_folder)
     # input_volume = os.path.join(input_volume_path, "final_nifti_volume.nii")
     model_path = os.path.join(base_path, "Model_Weights.npz")
-    reference_volume_path = os.path.join(ref_nifty_path, "dicom_Sag_3D_T1_GD_a_20000101000101_7.nii")
+    
+    matching_volume = find_nii_volume_with_name(ref_nifty_path, "Sag_3D_T1_GD")
+    reference_volume_path = os.path.join(ref_nifty_path, matching_volume )#"dicom_Sag_3D_T1_GD_a_20000101000101_7.nii")
 
     # Ensure the output directory exists
     os.makedirs(output_folder, exist_ok=True)
@@ -118,6 +133,3 @@ if __name__ == "__main__":
     model = load_model_from_npz(model_path, device)
     predict_and_process_volume(input_volume_path, model, device, transform, original_shape, original_spacing, reference_volume_path, output_folder)
     
-    
-    
-    #final_nifti_volume.nii
