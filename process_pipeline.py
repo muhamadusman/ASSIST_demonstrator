@@ -2,6 +2,19 @@ import os
 import subprocess
 import sys
 
+import logging
+import logging.handlers
+import sys
+
+import logging
+import os
+from logging.handlers import TimedRotatingFileHandler
+import sys
+
+
+
+
+
 def run_convert_dicom_to_nifti(dicom_folder, tmp_nifti_folder):
     subprocess.run(["python", "convert.py", dicom_folder, tmp_nifti_folder], check=True)
 
@@ -39,6 +52,9 @@ if __name__ == "__main__":
     
     dicom_folder_path = sys.argv[1]
     final_output_folder_path = sys.argv[2]
+    # print ("InputPath : ", dicom_folder_path)
+    # print ("OutputPath : ", final_output_folder_path)
+    
     
     tmp_nifti_folder = "/tmp/nifti/"
     tmp_sorted_Nifty = "/tmp/tmp_sorted_Nifty/"
@@ -59,17 +75,31 @@ if __name__ == "__main__":
     run_convert_dicom_to_nifti(dicom_folder_path, tmp_nifti_folder)
     run_singlemri(dicom_folder_path, tmp_singleMRI)
     
+    
+    # testimage = "/app/test_image/test.nii"
     # Step 2: Get useful NIfTI volume
+    print (tmp_nifti_folder)
+    print (tmp_sorted_Nifty)
     run_get_nifty(tmp_nifti_folder, tmp_sorted_Nifty, tmp_resampled_nifty_folder, itmp_final)
     
     # Step 3: Perform inference
-    run_inference(itmp_final, tmp_mask)
+    run_inference(itmp_final, tmp_mask) # tmp_mask
     
     # #Step 4 : Generate RTSTRUCT Mask
-    print ("Segmentation Mask Volume Path : ", tmp_mask)
     run_Convert_RTSTRUCT(tmp_mask,final_output_folder_path)
     
     
-    print ("******")
-    print ("*END*")
-    print ("******")
+    
+    # Define Complete Flag
+    file_name = os.path.join(final_output_folder_path, "completed.txt")
+    text_to_write = "Completed"
+    with open(file_name, 'w') as file:
+        file.write(text_to_write)
+        
+    print(f"'{text_to_write}' has been written to {file_name}")
+    
+    # Define the base directory for your logs
+
+
+
+
