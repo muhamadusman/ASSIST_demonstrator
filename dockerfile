@@ -24,12 +24,14 @@ RUN pip install --no-cache-dir \
     scikit-image 
 
 # Copy the scripts and any other necessary files into the image
-COPY . /app
-WORKDIR /app
+COPY . /appdata
+WORKDIR /appdata
 
-# Make sure the main script is executable
-RUN chmod +x process_pipeline.py
+RUN mkdir -p /logs /data /output
 
-# Set the ENTRYPOINT to run your master script
-ENTRYPOINT ["python", "process_pipeline.py"]
+# Make the Bash script executable
+RUN chmod +x ./entrypoint.sh
+
+# Run the Bash script when the container launches
+ENTRYPOINT ["./entrypoint.sh"]
 
