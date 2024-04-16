@@ -95,7 +95,7 @@ if __name__ == "__main__":
         
     print(f"'{text_to_write}' has been written to {file_name}")
     
-    # Define the base directory for your logs
+
 
 
 
