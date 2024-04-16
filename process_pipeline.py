@@ -12,9 +12,6 @@ from logging.handlers import TimedRotatingFileHandler
 import sys
 
 
-
-
-
 def run_convert_dicom_to_nifti(dicom_folder, tmp_nifti_folder):
     subprocess.run(["python", "convert.py", dicom_folder, tmp_nifti_folder], check=True)
 
@@ -56,11 +53,11 @@ if __name__ == "__main__":
     # print ("OutputPath : ", final_output_folder_path)
     
     
-    tmp_nifti_folder = "/tmp/nifti/"
+    tmp_nifti_folder = "/data/"
     tmp_sorted_Nifty = "/tmp/tmp_sorted_Nifty/"
     tmp_resampled_nifty_folder = "/tmp/resampled_nifty/"
     itmp_final = "/tmp/final_nifty/"
-    tmp_mask = "/tmp/final_nifty_mask/"
+    tmp_mask = "/output/"
     tmp_singleMRI = "/tmp/singlemri"
 
     # # Ensure intermediate directories exist
