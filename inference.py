@@ -110,7 +110,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     base_path = "/appdata/" 
-    ref_nifty_path = "/tmp/nifti/"
+    ref_nifty_path = "/data/"
     input_volume_path = args.input_volume_path
     output_folder = args.output_folder
     
