@@ -116,6 +116,11 @@ def process_volumes_in_folder_0(input_folder, output_folder, target_shape, text_
             print(f"Skipped {os.path.basename(nifti_file)} due to name mismatch")
 
 
+def normalize_volume(volume):
+    """Normalize the NIfTI volume to have pixel values between 0 and 1."""
+    min_val = np.min(volume)
+    max_val = np.max(volume)
+    return (volume - min_val) / (max_val - min_val)
 
 
 def concatenate_nifti_volumes(input_folder, output_path):
@@ -130,6 +135,7 @@ def concatenate_nifti_volumes(input_folder, output_path):
     for nifti_file in nifti_files:
         img = nib.load(nifti_file)
         img_data = img.get_fdata()
+        img_data = normalize_volume(img_data)
         # if os.path.basename(nifti_file) == volume_to_flip:
             # img_data = np.flip(img_data, axis=0)
         concatenated_data.append(img_data)
@@ -171,10 +177,10 @@ if __name__ == "__main__":
 
 
 
-    target_shape = (512, 512, 392)  # The desired new shape
-    text_fragments = ["Sag_3D_T1_GD", "Sag_3D_T2_flair", "Sag_3D_T1"]
+    target_shape = (512, 512, 392)  # orientation correction
+    text_fragments_2 = ["Sag_3D_T1_GD", "Sag_3D_T2_flair", "Sag_3D_T1"]
 
-    process_volumes_in_folder_0(temp_dir, temp_dir, target_shape, text_fragments)
+    process_volumes_in_folder_0(temp_dir, temp_dir, target_shape, text_fragments_2)
     
     # Step 2: Resample and reshape
     process_volumes_in_folder(temp_dir, resampled_dir, new_shape, new_spacing)
