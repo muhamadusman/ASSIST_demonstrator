@@ -12,6 +12,9 @@ from logging.handlers import TimedRotatingFileHandler
 import sys
 
 
+
+
+
 def run_convert_dicom_to_nifti(dicom_folder, tmp_nifti_folder):
     subprocess.run(["python", "convert.py", dicom_folder, tmp_nifti_folder], check=True)
 
@@ -34,8 +37,21 @@ def run_singlemri(dicom_folder, singlemri):
                     singlemri],    # Positional argument for output_folder
                    check=True)
 
+def run_upsample(input_folder,ref_folder ,output_folder):
+    subprocess.run(["python", "upsample.py",
+                     os.path.join(input_folder, "tmp_segmentation_downsampled.nii"),  # Positional argument for input_folder
+                     ref_folder,
+                     os.path.join(output_folder, "final_nifti_volume_upsampled.nii")],    # Positional argument for output_folder
+                   check=True)
+    
+def run_postProcess(input ,output):
+    subprocess.run(["python", "post_process.py",
+                     os.path.join(input, "final_nifti_volume_upsampled.nii"),  # Positional argument for input_folder
+                     os.path.join(output, "final_nifti_volume_upsampled.nii")],    # Positional argument for output_folder
+                   check=True)
+
 def run_Convert_RTSTRUCT(Segmenation_Mask, final_output_folder_path):
-    mask_volume = os.path.join(Segmenation_Mask, "tmp_segmentation_corrected.nii")
+    mask_volume = os.path.join(Segmenation_Mask, "final_nifti_volume_upsampled.nii")
     print("OutPut Directory : ", final_output_folder_path)
     subprocess.run(["python", "RTSTRUCT.py", 
                     mask_volume, 
@@ -75,12 +91,12 @@ if __name__ == "__main__":
     
     # testimage = "/app/test_image/test.nii"
     # Step 2: Get useful NIfTI volume
-    print (tmp_nifti_folder)
-    print (tmp_sorted_Nifty)
     run_get_nifty(tmp_nifti_folder, tmp_sorted_Nifty, tmp_resampled_nifty_folder, itmp_final)
     
     # Step 3: Perform inference
     run_inference(itmp_final, tmp_mask) # tmp_mask
+    run_upsample(tmp_mask,tmp_nifti_folder,tmp_mask)
+    run_postProcess(tmp_mask,tmp_mask)
     
     # #Step 4 : Generate RTSTRUCT Mask
     run_Convert_RTSTRUCT(tmp_mask,final_output_folder_path)
@@ -94,9 +110,6 @@ if __name__ == "__main__":
         file.write(text_to_write)
         
     print(f"'{text_to_write}' has been written to {file_name}")
-    
-
-
 
 
 
