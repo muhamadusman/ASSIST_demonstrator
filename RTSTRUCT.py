@@ -9,8 +9,8 @@ from datetime import datetime
 # Example mapping of label numbers to custom names
 # Update this dictionary based on your specific labels and desired ROI names
 label_to_name = {
-    1: "CTV",
-    2: "GTV",
+    1: "GTV",
+    2: "CTV",
     3: "BRAINSTEM",
     # Add more mappings as needed
 }
